@@ -10,6 +10,7 @@ jobs:
     container: ps2dev/ps2dev:v1.0 
     # instead of "ps2dev/ps2dev:latest" you can use different tags, for example for old projects you can use "ps2dev/ps2dev:v1.0"
     steps:
+    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
         apk add build-base git zip
