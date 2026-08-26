@@ -7,18 +7,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:v1.0 
-    # instead of "ps2dev/ps2dev:latest" you can use different tags, for example for old projects you can use "ps2dev/ps2dev:v1.0"
+    container: ps2dev/ps2dev:latest
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Configure Git Safe Directory
+      run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
     - name: Install dependencies
       run: |
         apk add build-base git zip
-
-    - uses: actions/checkout@v4
-    - run: |
-        git config --global --add safe.directory "$GITHUB_WORKSPACE"
-        git fetch --prune --unshallow
 
     - name: Compile project
       run: |
@@ -26,7 +29,7 @@ jobs:
 
     - name: Get short SHA
       id: slug
-      run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+      run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
 
     - name: Upload artifacts
       if: ${{ success() }}
@@ -34,4 +37,3 @@ jobs:
       with:
         name: SMS-${{ steps.slug.outputs.sha8 }}
         path: bin/SMS.elf
-    # commands for compiling your project
